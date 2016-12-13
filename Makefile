@@ -60,7 +60,7 @@ postgres:
 	@docker exec -ti teamladders_postgres bash
 
 redis:
-	@docker exec -ti teamladders_nginx bash
+	@docker exec -ti teamladders_redis bash
 
 nginx:
 	@docker exec -ti teamladders_nginx bash
