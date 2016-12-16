@@ -1,0 +1,22 @@
+server {
+    listen  80;
+
+    root /work/;
+
+    location / {
+        try_files $uri /index.php$is_args$args;
+    }
+
+    location \/\..+ {
+        return 404;
+    }	
+
+    location ~ \.php$ {
+        if (!-f $document_root$fastcgi_script_name) {
+            return 404;
+	}
+        fastcgi_pass fpm:9000;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}
