@@ -11,7 +11,9 @@ help:
 	@echo "COMMANDS: help build start stop restart rm status app nginx mysql\nRead README.md for more information";
 
 dbs:
-	#TODO create DBs
+	@export PGPASSWORD='postgres'
+	@psql -h 127.0.0.1 -p 5432 --username=postgres -c "CREATE DATABASE teamladders;"
+	@psql -h 127.0.0.1 -p 5432 --username=postgres -c "GRANT ALL PRIVILEGES ON database teamladders TO postgres;"
 
 build:
 	@echo "== build containers";
