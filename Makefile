@@ -11,7 +11,9 @@ help:
 	@echo "COMMANDS: help build start stop restart rm status app nginx mysql\nRead README.md for more information";
 
 dbs:
-	#TODO create DBs
+	@export PGPASSWORD='postgres'
+	@psql -h 127.0.0.1 -p 5432 --username=postgres -c "CREATE DATABASE teamladders;"
+	@psql -h 127.0.0.1 -p 5432 --username=postgres -c "GRANT ALL PRIVILEGES ON database teamladders TO postgres;"
 
 build:
 	@echo "== build containers";
@@ -47,11 +49,21 @@ stop:
 
 restart:
 	@echo "== restart containers";
+	@mkdir -p $(STORAGE_ROOT)/postgres
+	@mkdir -p $(STORAGE_ROOT)/nginx/conf.d
+	@mkdir -p $(STORAGE_ROOT)/nginx/log
+	@mkdir -p $(STORAGE_ROOT)/redis
+	@mkdir -p $(STORAGE_ROOT)/php-fpm
+	@mkdir -p $(STORAGE_ROOT)/work
+	@cp -pu conf/redis/redis.conf $(STORAGE_ROOT)/redis
+	@cp -pu conf/nginx/nginx.conf $(STORAGE_ROOT)/nginx
+	@cp -pu conf/nginx/conf.d/default $(STORAGE_ROOT)/nginx/conf.d
+	@cp -pu conf/php-fpm/php.ini $(STORAGE_ROOT)/php-fpm
 	@$(DOCKER_CMD) restart
 
 rm:
 	@echo "== stop and remove containers";
-	@$(DOCKER_CMD) down	
+	@$(DOCKER_CMD) down
 
 status:
 	@$(DOCKER_CMD) ps

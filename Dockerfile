@@ -6,8 +6,16 @@ WORKDIR /work
 
 RUN apt-get update && apt-get install -y \
         sudo \
-        libpq-dev
+        libpq-dev \
+        nodejs \
+        npm
+
+RUN ln -s "$(which nodejs)" /usr/sbin/node
 
 RUN docker-php-ext-install pdo_pgsql
+
+RUN curl -sS https://getcomposer.org/installer -o ~/composer-setup.php \
+    && php ~/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && rm -rf ~/composer-setup.php
 
 RUN rm -rf /var/lib/apt/lists/*
