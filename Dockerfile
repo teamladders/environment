@@ -6,7 +6,9 @@ WORKDIR /work
 
 RUN apt-get update && apt-get install -y \
         sudo \
-        libpq-dev
+        libpq-dev \
+        nodejs \
+        npm
 
 RUN docker-php-ext-install pdo_pgsql
 
