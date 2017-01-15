@@ -7,10 +7,18 @@ WORKDIR /work
 RUN apt-get update && apt-get install -y \
         sudo \
         libpq-dev \
-        nodejs \
-        npm
+        libcurl4-gnutls-dev \
+        libexpat1-dev gettext \
+        libz-dev \
+        libssl-dev \
+        git
+
+RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - \
+    && apt-get install -y nodejs
 
 RUN ln -s "$(which nodejs)" /usr/sbin/node
+
+RUN npm install gulp-cli -g
 
 RUN docker-php-ext-install pdo_pgsql
 

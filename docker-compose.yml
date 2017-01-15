@@ -24,7 +24,7 @@ services:
 
   nginx:
     container_name: teamladders_nginx
-    image: nginx:1.11
+    image: nginx:1.11.8
     volumes:
       - /var/docker/env_teamladders/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - /var/docker/env_teamladders/nginx/conf.d:/etc/nginx/conf.d:ro
@@ -39,11 +39,10 @@ services:
   fpm:
     container_name: teamladders_fpm
     build: .
-    restart: always  
+    restart: always
     volumes:
       - /var/docker/env_teamladders/php-fpm/php.ini:/usr/local/etc/php/php.ini
       - /var/docker/env_teamladders/work:/work
     depends_on:
       - postgres
-      - redis    
-    
+      - redis
