@@ -1,5 +1,8 @@
 PROJECT_NAME = teamladders
-STORAGE_ROOT = /var/docker/env_teamladders
+
+ifndef TEAMLADDERS_STORAGE_ROOT
+	export TEAMLADDERS_STORAGE_ROOT="/var/docker/env_teamladders"
+endif
 
 DOCKER_CMD = docker-compose -p $(PROJECT_NAME)
 
@@ -17,30 +20,28 @@ dbs:
 
 build:
 	@echo "== build containers";
-	@mkdir -p $(STORAGE_ROOT)/postgres
-	@mkdir -p $(STORAGE_ROOT)/nginx/conf.d
-	@mkdir -p $(STORAGE_ROOT)/nginx/log
-	@mkdir -p $(STORAGE_ROOT)/redis
-	@mkdir -p $(STORAGE_ROOT)/php-fpm
-	@mkdir -p $(STORAGE_ROOT)/work
-	@cp -pu conf/redis/redis.conf $(STORAGE_ROOT)/redis
-	@cp -pu conf/nginx/nginx.conf $(STORAGE_ROOT)/nginx
-	@cp -pu conf/nginx/conf.d/default $(STORAGE_ROOT)/nginx/conf.d
-	@cp -pu conf/php-fpm/php.ini $(STORAGE_ROOT)/php-fpm
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/postgres
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/conf.d
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/log
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/redis
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/work
+	@rsync -u conf/redis/ $(TEAMLADDERS_STORAGE_ROOT)/redis
+	@rsync -u conf/nginx/ $(TEAMLADDERS_STORAGE_ROOT)/nginx
+	@rsync -u conf/php-fpm/ $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
 	@$(DOCKER_CMD) build
 
 start:
 	@echo "== start containers";
-	@mkdir -p $(STORAGE_ROOT)/postgres
-	@mkdir -p $(STORAGE_ROOT)/nginx/conf.d
-	@mkdir -p $(STORAGE_ROOT)/nginx/log
-	@mkdir -p $(STORAGE_ROOT)/redis
-	@mkdir -p $(STORAGE_ROOT)/php-fpm
-	@mkdir -p $(STORAGE_ROOT)/work
-	@cp -pu conf/redis/redis.conf $(STORAGE_ROOT)/redis
-	@cp -pu conf/nginx/nginx.conf $(STORAGE_ROOT)/nginx
-	@cp -pu conf/nginx/conf.d/default $(STORAGE_ROOT)/nginx/conf.d
-	@cp -pu conf/php-fpm/php.ini $(STORAGE_ROOT)/php-fpm
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/postgres
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/conf.d
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/log
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/redis
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/work
+	@rsync -u conf/redis/ $(TEAMLADDERS_STORAGE_ROOT)/redis
+	@rsync -u conf/nginx/ $(TEAMLADDERS_STORAGE_ROOT)/nginx
+	@rsync -u conf/php-fpm/ $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
 	@$(DOCKER_CMD) up -d
 
 stop:
@@ -49,16 +50,15 @@ stop:
 
 restart:
 	@echo "== restart containers";
-	@mkdir -p $(STORAGE_ROOT)/postgres
-	@mkdir -p $(STORAGE_ROOT)/nginx/conf.d
-	@mkdir -p $(STORAGE_ROOT)/nginx/log
-	@mkdir -p $(STORAGE_ROOT)/redis
-	@mkdir -p $(STORAGE_ROOT)/php-fpm
-	@mkdir -p $(STORAGE_ROOT)/work
-	@cp -pu conf/redis/redis.conf $(STORAGE_ROOT)/redis
-	@cp -pu conf/nginx/nginx.conf $(STORAGE_ROOT)/nginx
-	@cp -pu conf/nginx/conf.d/default $(STORAGE_ROOT)/nginx/conf.d
-	@cp -pu conf/php-fpm/php.ini $(STORAGE_ROOT)/php-fpm
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/postgres
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/conf.d
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/log
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/redis
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/work
+	@rsync -u conf/redis/ $(TEAMLADDERS_STORAGE_ROOT)/redis
+	@rsync -u conf/nginx/ $(TEAMLADDERS_STORAGE_ROOT)/nginx
+	@rsync -u conf/php-fpm/ $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
 	@$(DOCKER_CMD) restart
 
 rm:
