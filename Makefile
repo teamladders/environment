@@ -1,7 +1,7 @@
 PROJECT_NAME = teamladders
 
 ifndef TEAMLADDERS_STORAGE_ROOT
-	export TEAMLADDERS_STORAGE_ROOT="/var/docker/env_teamladders"
+	export TEAMLADDERS_STORAGE_ROOT=/var/docker/env_teamladders
 endif
 
 DOCKER_CMD = docker-compose -p $(PROJECT_NAME)
