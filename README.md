@@ -21,4 +21,4 @@ nginx:      NGINX container bash
 app:        Main application container
 </pre>
 
-Before starting the work execute `make set` to make environment configuration file.
+<b>Before starting the work execute `make set` to make environment configuration file.</b>
