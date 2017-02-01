@@ -44,9 +44,9 @@ cpconfigs:
 	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/redis
 	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
 	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/work
-	@rsync -u conf/redis/ $(TEAMLADDERS_STORAGE_ROOT)/redis
-	@rsync -u conf/nginx/ $(TEAMLADDERS_STORAGE_ROOT)/nginx
-	@rsync -u conf/php-fpm/ $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
+	@rsync -ur conf/redis/* $(TEAMLADDERS_STORAGE_ROOT)/redis
+	@rsync -ur conf/nginx/* $(TEAMLADDERS_STORAGE_ROOT)/nginx
+	@rsync -ur conf/php-fpm/* $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
 
 build:
 	@echo "== build containers";
