@@ -1,13 +1,15 @@
 SHELL := /bin/bash
 
 ENVFILE = .env
-
-include $(ENVFILE)
+ifneq ("$(wildcard $(ENVFILE))","")
+	include $(ENVFILE)
+else
+	ENV_IS_NOT_EXISTS = 1
+endif
 
 DOCKER_CMD = docker-compose -p $(PROJECT_NAME)
 
-
-.PHONY: help set dbs cpconfigs build start stop restart status rm postgres redis nginx app
+.PHONY: help check-env set dbs cpconfigs build start stop restart status rm postgres redis nginx app
 
 
 help:
@@ -26,6 +28,11 @@ help:
 		\n\tmysql\
 		\nRead README.md for more information\n";
 
+check-env:
+	ifndef ENV_IS_NOT_EXISTS
+	    $(error ENVFILE doesn't exist. Run `make set` to fix it)
+	endif
+
 set:
 	@read -p "PROJECT_NAME=" NEW_PROJECT_NAME; \
 		printf "PROJECT_NAME=$(strip $$NEW_PROJECT_NAME)\n" > $(ENVFILE);
@@ -38,6 +45,7 @@ dbs:
 		psql -h 127.0.0.1 -p 5432 --username=postgres -c "GRANT ALL PRIVILEGES ON database teamladders TO postgres;";
 
 cpconfigs:
+	$(MAKE) check-env
 	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/postgres
 	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/conf.d
 	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/log

@@ -21,4 +21,4 @@ nginx:      NGINX container bash
 app:        Main application container
 </pre>
 
-You can specify custom location for persistent stuff (config files, database files) via env variable `TEAMLADDERS_STORAGE_ROOT`. Default value is `/var/docker/env_teamladders`.
+Before starting the work execute `make set` to make environment configuration file.
