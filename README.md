@@ -6,7 +6,9 @@ Syntax: make RULE
 <pre>
 Rules list:
 help:       shows a list of commands
+set:        set custom environment parameters
 dbs:        makes databases for application
+cpconfigs:  copy configs to environment directory
 build:      builds (or rebuilds) containers, copies all configure files from conf directory
 start:      starts containers with current configuration from conf directory
 stop:       stops containers

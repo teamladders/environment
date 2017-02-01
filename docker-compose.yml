@@ -4,6 +4,7 @@ services:
 
   postgres:
     container_name: teamladders_postgres
+    env_file: .env
     image: postgres:9.6.1
     volumes:
       - "${TEAMLADDERS_STORAGE_ROOT}/postgres:/var/lib/postgresql/data"
@@ -16,6 +17,7 @@ services:
 
   redis:
     container_name: teamladders_redis
+    env_file: .env
     image: redis:3.0.7
     volumes:
       - "${TEAMLADDERS_STORAGE_ROOT}/redis/redis.conf:/usr/local/etc/redis/redis.conf"
@@ -24,6 +26,7 @@ services:
 
   nginx:
     container_name: teamladders_nginx
+    env_file: .env
     image: nginx:1.11.8
     volumes:
       - "${TEAMLADDERS_STORAGE_ROOT}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
@@ -38,6 +41,7 @@ services:
 
   fpm:
     container_name: teamladders_fpm
+    env_file: .env
     build: .
     restart: always
     volumes:

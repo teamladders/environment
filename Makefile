@@ -1,25 +1,43 @@
-PROJECT_NAME = teamladders
+SHELL := /bin/bash
 
-ifndef TEAMLADDERS_STORAGE_ROOT
-	export TEAMLADDERS_STORAGE_ROOT=/var/docker/env_teamladders
-endif
+ENVFILE = .env
+
+include $(ENVFILE)
 
 DOCKER_CMD = docker-compose -p $(PROJECT_NAME)
 
 
-.PHONY: help dbs build start stop restart status rm postgres redis nginx app
+.PHONY: help set dbs cpconfigs build start stop restart status rm postgres redis nginx app
 
 
 help:
-	@echo "COMMANDS: help build start stop restart rm status app nginx mysql\nRead README.md for more information";
+	@printf "COMMANDS:\
+		\n\thelp\
+		\n\tset\
+		\n\tcpconfigs\
+		\n\tbuild\
+		\n\tstart\
+		\n\tstop\
+		\n\trestart\
+		\n\trm\
+		\n\tstatus\
+		\n\tapp\
+		\n\tnginx\
+		\n\tmysql\
+		\nRead README.md for more information\n";
+
+set:
+	@read -p "PROJECT_NAME=" NEW_PROJECT_NAME; \
+		printf "PROJECT_NAME=$(strip $$NEW_PROJECT_NAME)\n" > $(ENVFILE);
+	@read -p "TEAMLADDERS_STORAGE_ROOT=" NEW_TEAMLADDERS_STORAGE_ROOT; \
+		printf "TEAMLADDERS_STORAGE_ROOT=$(strip $$NEW_TEAMLADDERS_STORAGE_ROOT)" >> $(ENVFILE);
 
 dbs:
-	@export PGPASSWORD='postgres'
-	@psql -h 127.0.0.1 -p 5432 --username=postgres -c "CREATE DATABASE teamladders;"
-	@psql -h 127.0.0.1 -p 5432 --username=postgres -c "GRANT ALL PRIVILEGES ON database teamladders TO postgres;"
+	@export PGPASSWORD='postgres'; \
+		psql -h 127.0.0.1 -p 5432 --username=postgres -c "CREATE DATABASE teamladders;"; \
+		psql -h 127.0.0.1 -p 5432 --username=postgres -c "GRANT ALL PRIVILEGES ON database teamladders TO postgres;";
 
-build:
-	@echo "== build containers";
+cpconfigs:
 	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/postgres
 	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/conf.d
 	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/log
@@ -29,19 +47,15 @@ build:
 	@rsync -u conf/redis/ $(TEAMLADDERS_STORAGE_ROOT)/redis
 	@rsync -u conf/nginx/ $(TEAMLADDERS_STORAGE_ROOT)/nginx
 	@rsync -u conf/php-fpm/ $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
+
+build:
+	@echo "== build containers";
+	$(MAKE) cpconfigs
 	@$(DOCKER_CMD) build
 
 start:
 	@echo "== start containers";
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/postgres
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/conf.d
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/log
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/redis
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/work
-	@rsync -u conf/redis/ $(TEAMLADDERS_STORAGE_ROOT)/redis
-	@rsync -u conf/nginx/ $(TEAMLADDERS_STORAGE_ROOT)/nginx
-	@rsync -u conf/php-fpm/ $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
+	$(MAKE) cpconfigs
 	@$(DOCKER_CMD) up -d
 
 stop:
@@ -50,15 +64,7 @@ stop:
 
 restart:
 	@echo "== restart containers";
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/postgres
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/conf.d
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/log
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/redis
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/work
-	@rsync -u conf/redis/ $(TEAMLADDERS_STORAGE_ROOT)/redis
-	@rsync -u conf/nginx/ $(TEAMLADDERS_STORAGE_ROOT)/nginx
-	@rsync -u conf/php-fpm/ $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
+	$(MAKE) cpconfigs
 	@$(DOCKER_CMD) restart
 
 rm:
