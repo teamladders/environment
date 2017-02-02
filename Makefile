@@ -1,22 +1,40 @@
 SHELL := /bin/bash
 
+
 ENVFILE = .env
 ifneq ("$(wildcard $(ENVFILE))","")
 	include $(ENVFILE)
-else
-	ENV_IS_NOT_EXISTS = 1
 endif
 
 DOCKER_CMD = docker-compose -p $(PROJECT_NAME)
 
-.PHONY: help check-env set dbs cpconfigs build start stop restart status rm postgres redis nginx app
 
+define check_env_file_exists
+	@if !([ -f $(1) ]); then \
+	   echo "Error: '$(1)' is not found! Try 'make set' to fix it."; \
+	   exit 1; \
+	fi;
+endef
+
+define copy_configs
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/postgres
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/conf.d
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/log
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/redis
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
+	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/work
+	@rsync -ur conf/redis/* $(TEAMLADDERS_STORAGE_ROOT)/redis
+	@rsync -ur conf/nginx/* $(TEAMLADDERS_STORAGE_ROOT)/nginx
+	@rsync -ur conf/php-fpm/* $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
+endef
+
+
+.PHONY: help check-env set dbs cpconfigs build start stop restart status rm postgres redis nginx app
 
 help:
 	@printf "COMMANDS:\
 		\n\thelp\
 		\n\tset\
-		\n\tcpconfigs\
 		\n\tbuild\
 		\n\tstart\
 		\n\tstop\
@@ -27,11 +45,6 @@ help:
 		\n\tnginx\
 		\n\tmysql\
 		\nRead README.md for more information\n";
-
-check-env:
-	ifndef ENV_IS_NOT_EXISTS
-	    $(error ENVFILE doesn't exist. Run `make set` to fix it)
-	endif
 
 set:
 	@read -p "PROJECT_NAME=" NEW_PROJECT_NAME; \
@@ -44,26 +57,16 @@ dbs:
 		psql -h 127.0.0.1 -p 5432 --username=postgres -c "CREATE DATABASE teamladders;"; \
 		psql -h 127.0.0.1 -p 5432 --username=postgres -c "GRANT ALL PRIVILEGES ON database teamladders TO postgres;";
 
-cpconfigs:
-	$(MAKE) check-env
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/postgres
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/conf.d
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/nginx/log
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/redis
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
-	@mkdir -p $(TEAMLADDERS_STORAGE_ROOT)/work
-	@rsync -ur conf/redis/* $(TEAMLADDERS_STORAGE_ROOT)/redis
-	@rsync -ur conf/nginx/* $(TEAMLADDERS_STORAGE_ROOT)/nginx
-	@rsync -ur conf/php-fpm/* $(TEAMLADDERS_STORAGE_ROOT)/php-fpm
-
 build:
 	@echo "== build containers";
-	$(MAKE) cpconfigs
+	$(call check_env_file_exists,$(ENVFILE))
+	$(call copy_configs)
 	@$(DOCKER_CMD) build
 
 start:
 	@echo "== start containers";
-	$(MAKE) cpconfigs
+	$(call check_env_file_exists,$(ENVFILE))
+	$(call copy_configs)
 	@$(DOCKER_CMD) up -d
 
 stop:
@@ -72,7 +75,8 @@ stop:
 
 restart:
 	@echo "== restart containers";
-	$(MAKE) cpconfigs
+	$(call check_env_file_exists,$(ENVFILE))
+	$(call copy_configs)
 	@$(DOCKER_CMD) restart
 
 rm:
