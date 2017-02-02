@@ -29,7 +29,7 @@ define copy_configs
 endef
 
 
-.PHONY: help check-env set dbs cpconfigs build start stop restart status rm postgres redis nginx app
+.PHONY: help set dbs build start stop restart status rm postgres redis nginx app
 
 help:
 	@printf "COMMANDS:\
